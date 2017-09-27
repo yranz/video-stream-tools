@@ -1,6 +1,5 @@
 {
   "presets": ["env"],
-  "ignore": [
-    "**/*.test.js"
-  ]
+  "compact": true,
+  "sourceMaps": true
 }

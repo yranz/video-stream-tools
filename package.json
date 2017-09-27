@@ -6,6 +6,10 @@
   "author": "Rhys Burnie",
   "license": "MIT",
   "private": true,
+  "dependencies": {
+    "xml2js": "^0.4.19",
+    "iso8601-duration-conversion": "git+https://git@github.com/rhysburnie/iso8601-duration-conversion.git"
+  },
   "devDependencies": {
     "ava": "^0.22.0",
     "babel-cli": "^6.26.0",
@@ -14,16 +18,13 @@
   },
   "scripts": {
     "test": "ava",
-    "build": "babel src -d lib"
+    "build": "babel --ignore=**/*.test.js src -d lib --source-maps",
+    "prepare": "npm run build"
   },
   "ava": {
     "require": [
       "babel-register"
     ],
     "babel": "inherit"
-  },
-  "dependencies": {
-    "xml2js": "^0.4.19",
-    "iso8601-duration-conversion": "git+https://git@github.com/rhysburnie/iso8601-duration-conversion.git"
   }
 }
