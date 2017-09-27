@@ -1,3 +1,5 @@
-import hello from './hello';
+import mpdMerge from './mpdMerge/mpdMerge.js';
 
-export default hello;
+export default {
+  mpdMerge
+};

@@ -1,16 +1,29 @@
 {
   "name": "dynamic-video-sequences",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "lib/index.js",
   "repository": "git@bitbucket.org:rhysburnie/dynamic-video-sequences.git",
   "author": "Rhys Burnie",
   "license": "MIT",
   "private": true,
   "devDependencies": {
+    "ava": "^0.22.0",
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.0"
+    "babel-preset-env": "^1.6.0",
+    "babel-register": "^6.26.0"
   },
   "scripts": {
+    "test": "ava",
     "build": "babel src -d lib"
+  },
+  "ava": {
+    "require": [
+      "babel-register"
+    ],
+    "babel": "inherit"
+  },
+  "dependencies": {
+    "xml2js": "^0.4.19",
+    "iso8601-duration-conversion": "git+https://git@github.com/rhysburnie/iso8601-duration-conversion.git"
   }
 }
