@@ -1,5 +1,3 @@
-import mpdMerge from './mpdMerge/mpdMerge.js';
+import mpdMerge from "./mpdMerge/mpdMerge.js";
 
-export default {
-  mpdMerge
-};
+export { mpdMerge };
