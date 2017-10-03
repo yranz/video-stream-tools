@@ -5,13 +5,13 @@ import { Parser, Builder } from "xml2js";
 import {
   isoDurationToMilliseconds,
   millisecondsToIso8601Duration
-} from "../timeConversion";
+} from "./timeConversion";
 
 import mpdMerge from "./mpdMerge";
 
 const mockRefs = ["video1", "video2"];
 
-const mockBucketFolderPath = path.resolve(__dirname, "../../fixtures/bucket");
+const mockBucketFolderPath = path.resolve(__dirname, "../fixtures/bucket");
 
 const mockRelativePathToEncodedFromMerged = "../encoded";
 

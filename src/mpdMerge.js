@@ -2,7 +2,7 @@ import { Parser, Builder } from "xml2js";
 import {
   isoDurationToMilliseconds,
   millisecondsToIso8601Duration
-} from "../timeConversion";
+} from "./timeConversion";
 
 const parser = new Parser();
 const builder = new Builder();
