@@ -1,8 +1,8 @@
 {
-  "name": "dynamic-video-sequences",
+  "name": "video-stream-tools",
   "version": "0.0.1",
   "main": "lib/index.js",
-  "repository": "git@bitbucket.org:rhysburnie/dynamic-video-sequences.git",
+  "repository": "git+ssh://git@github.com:/yranz/video-stream-tools.git",
   "author": "Rhys Burnie",
   "license": "MIT",
   "private": true,
@@ -23,9 +23,7 @@
     "prepare": "npm run build"
   },
   "ava": {
-    "require": [
-      "babel-register"
-    ],
+    "require": ["babel-register"],
     "babel": "inherit"
   }
 }
