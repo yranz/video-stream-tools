@@ -11,7 +11,10 @@ import mpdMerge from "./mpdMerge";
 
 const mockRefs = ["video1", "video2"];
 
-const mockBucketFolderPath = path.resolve(__dirname, "../fixtures/bucket");
+const mockBucketFolderPath = path.resolve(
+  __dirname,
+  "../fixtures/bucket/encoded"
+);
 
 const mockRelativePathToEncodedFromMerged = "../encoded";
 
