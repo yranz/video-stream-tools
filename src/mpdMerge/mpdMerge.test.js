@@ -2,7 +2,10 @@ import { test } from "ava";
 import fs from "fs";
 import path from "path";
 import { Parser, Builder } from "xml2js";
-import { toMilliseconds, msToString } from "iso8601-duration-conversion";
+import {
+  isoDurationToMilliseconds,
+  millisecondsToIso8601Duration
+} from "../timeConversion";
 
 import mpdMerge from "./mpdMerge";
 
@@ -19,8 +22,8 @@ const mpdContents = mpdRef =>
   );
 
 test("preflight", t => {
-  t.is(typeof toMilliseconds, "function");
-  t.is(typeof msToString, "function");
+  t.is(typeof isoDurationToMilliseconds, "function");
+  t.is(typeof millisecondsToIso8601Duration, "function");
   t.is(typeof Parser, "function");
   t.is(typeof Builder, "function");
   const parser = new Parser();
@@ -39,7 +42,7 @@ test("preflight", t => {
       t.is(typeof pojo, "object");
       t.is(typeof pojo.MPD, "object");
       t.is(
-        typeof toMilliseconds(pojo.MPD.$.mediaPresentationDuration),
+        typeof isoDurationToMilliseconds(pojo.MPD.$.mediaPresentationDuration),
         "number"
       );
       t.true(Array.isArray(pojo.MPD.Period));

@@ -1,5 +1,8 @@
 import { Parser, Builder } from "xml2js";
-import { toMilliseconds, msToString } from "iso8601-duration-conversion";
+import {
+  isoDurationToMilliseconds,
+  millisecondsToIso8601Duration
+} from "../timeConversion";
 
 const parser = new Parser();
 const builder = new Builder();
@@ -32,17 +35,21 @@ export default function mpdMerge(data) {
       } else {
         let startOffset = getTotalDuration();
         pojo.MPD.Period.forEach(Period => {
-          const start = toMilliseconds(Period.$.start);
-          Period.$.start = msToString(start + startOffset);
+          const start = isoDurationToMilliseconds(Period.$.start);
+          Period.$.start = millisecondsToIso8601Duration(start + startOffset);
           replacePathToSelf(Period, obj.replacePathToSelfRoot);
         });
         pojoOut.MPD.Period = pojoOut.MPD.Period.concat(pojo.MPD.Period);
       }
-      durations.push(toMilliseconds(pojo.MPD.$.mediaPresentationDuration));
+      durations.push(
+        isoDurationToMilliseconds(pojo.MPD.$.mediaPresentationDuration)
+      );
     });
   });
 
-  pojoOut.MPD.$.mediaPresentationDuration = msToString(getTotalDuration());
+  pojoOut.MPD.$.mediaPresentationDuration = millisecondsToIso8601Duration(
+    getTotalDuration()
+  );
 
   return builder.buildObject(pojoOut);
 }

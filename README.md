@@ -1,4 +1,4 @@
-# Dynamic Video Sequences
+# Video Stream Tools
 
 ## Development Commands
 
