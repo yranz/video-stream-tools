@@ -3,7 +3,7 @@ import reader from "m3u8-reader";
 import writer from "m3u8-write";
 import { mockUrl, getFileContent } from "./_mockRequestm3u8File";
 
-import hlsMerge from "./hlsMerge";
+import hlsMerge from "../../src/hlsMerge/hlsMerge";
 
 test("hlsMerge", async t => {
   const mockData = [

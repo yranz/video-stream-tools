@@ -1,6 +1,6 @@
 import { test } from "ava";
 import request from "request-promise-native";
-import { mockUrl, getFileContent } from "./_mockRequestm3u8File";
+import { mockUrl, getFileContent } from "./hlsMerge/_mockRequestm3u8File";
 
 // NOTE: by importing the _mockRequestm3u8File test helper
 //       a nock handler will be setup for `mockUrl`

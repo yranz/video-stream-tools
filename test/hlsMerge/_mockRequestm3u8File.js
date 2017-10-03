@@ -6,7 +6,7 @@ export const mockUrl = "http://whatever/bucket/encoded";
 const m3u8PathRegExp = /\/([0-9a-z]+)\/hls\/([0-9a-z-]+)\.m3u8/;
 const mockBucketFolderPath = path.resolve(
   __dirname,
-  "../../fixtures/bucket/encoded"
+  "../fixtures/bucket/encoded"
 );
 
 const mockContent = {};
