@@ -25,14 +25,11 @@
   },
   "scripts": {
     "test": "ava",
-    "build": "babel --ignore=**/*.test.js src -d lib --source-maps",
+    "build": "babel --ignore=**/*.test.js,**_*.js src -d lib --source-maps",
     "prepare": "npm run build"
   },
   "ava": {
-    "require": [
-      "babel-register",
-      "babel-polyfill"
-    ],
+    "require": ["babel-register", "babel-polyfill"],
     "babel": "inherit"
   }
 }
