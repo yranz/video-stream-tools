@@ -16,8 +16,12 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "babel-cli": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.0",
-    "babel-register": "^6.26.0"
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "nock": "^9.0.22",
+    "request-promise-native": "^1.0.5"
   },
   "scripts": {
     "test": "ava",
@@ -26,7 +30,8 @@
   },
   "ava": {
     "require": [
-      "babel-register"
+      "babel-register",
+      "babel-polyfill"
     ],
     "babel": "inherit"
   }

@@ -22,16 +22,16 @@ const replacePathToSelf = (Period, { to, from }) => {
 };
 
 export default function mpdMerge(data) {
-  let pojoOut;
+  let mpdPOJO;
   const durations = [];
   const getTotalDuration = () => durations.reduce((a, b) => a + b, 0);
   data.forEach(obj => {
     parser.parseString(obj.body, function(err, pojo) {
-      if (!pojoOut) {
+      if (!mpdPOJO) {
         pojo.MPD.Period.forEach(Period =>
           replacePathToSelf(Period, obj.replacePathToSelfRoot)
         );
-        pojoOut = pojo;
+        mpdPOJO = pojo;
       } else {
         let startOffset = getTotalDuration();
         pojo.MPD.Period.forEach(Period => {
@@ -39,7 +39,7 @@ export default function mpdMerge(data) {
           Period.$.start = millisecondsToIso8601Duration(start + startOffset);
           replacePathToSelf(Period, obj.replacePathToSelfRoot);
         });
-        pojoOut.MPD.Period = pojoOut.MPD.Period.concat(pojo.MPD.Period);
+        mpdPOJO.MPD.Period = mpdPOJO.MPD.Period.concat(pojo.MPD.Period);
       }
       durations.push(
         isoDurationToMilliseconds(pojo.MPD.$.mediaPresentationDuration)
@@ -47,9 +47,9 @@ export default function mpdMerge(data) {
     });
   });
 
-  pojoOut.MPD.$.mediaPresentationDuration = millisecondsToIso8601Duration(
+  mpdPOJO.MPD.$.mediaPresentationDuration = millisecondsToIso8601Duration(
     getTotalDuration()
   );
 
-  return builder.buildObject(pojoOut);
+  return builder.buildObject(mpdPOJO);
 }
