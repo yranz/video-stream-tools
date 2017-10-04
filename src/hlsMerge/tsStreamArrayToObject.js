@@ -1,7 +1,7 @@
-export default function audioStreamArrayToObject(streamArray) {
+export default function tsStreamArrayToObject(streamArray) {
   const arr = streamArray.slice();
   const obj = {
-    audio: [],
+    ts: [],
     other: [],
     groupInsertPoints: {}
   };
@@ -9,10 +9,10 @@ export default function audioStreamArrayToObject(streamArray) {
   let lastPointer = -1;
   arr.forEach((item, pointer) => {
     if (item.EXTINF) {
-      if (!obj.audio.length) {
-        obj.groupInsertPoints[pointer] = "audio";
+      if (!obj.ts.length) {
+        obj.groupInsertPoints[pointer] = "ts";
       }
-      obj.audio.push(item);
+      obj.ts.push(item);
     } else if (typeof item === "string" && arr[lastPointer].EXTINF) {
       // NOTE: `__FILEPATH__` is not a valid m3u8 prop
       //
@@ -25,10 +25,7 @@ export default function audioStreamArrayToObject(streamArray) {
       if (!obj.other.length) {
         obj.groupInsertPoints[pointer] = "other";
       }
-      if (
-        item.hasOwnProperty("ENDLIST") &&
-        item.ENDLIST == undefined
-      ) {
+      if (item.hasOwnProperty("ENDLIST") && item.ENDLIST == undefined) {
         obj.other.push("#EXT-X-ENDLIST");
       } else {
         obj.other.push(item);

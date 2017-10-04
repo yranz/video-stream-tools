@@ -4,25 +4,23 @@ import request from "request-promise-native";
 import streamArrayToObject from "./streamArrayToObject";
 import streamObjectToArray from "./streamObjectToArray";
 import streamObjectVideoSortByFileName from "./streamObjectVideoSortByFileName";
-import audioStreamArrayToObject from './audioStreamArrayToObject';
-import audioStreamObjectToArray from './audioStreamObjectToArray';
-import videoStreamArrayToObject from './videoStreamArrayToObject';
-import videoStreamObjectToArray from './videoStreamObjectToArray';
+import tsStreamArrayToObject from "./tsStreamArrayToObject";
+import tsStreamObjectToArray from "./tsStreamObjectToArray";
 
 export default function hlsMerge(data) {
-  let masterStreamObject;
-  const masterAudioStreamObjects = [];
-  const masterVideoStreamObjects = [];
+  let streamObjectMaster;
+  const tsStreamMasters = { audio: [], video: [] };
 
   const streamValidShape = streamObject => {
     return (
-      masterStreamObject.header.length === streamObject.header.length &&
-      masterStreamObject.audio.length === streamObject.audio.length &&
-      masterStreamObject.video.length === streamObject.video.length &&
-      Object.keys(masterStreamObject.groupInsertPoints).every(key => {
+      streamObjectMaster.header.length === streamObject.header.length &&
+      streamObjectMaster.audio.length === streamObject.audio.length &&
+      streamObjectMaster.video.length === streamObject.video.length &&
+      Object.keys(streamObjectMaster.groupInsertPoints).every(key => {
         return (
           streamObject.groupInsertPoints[key] &&
-          streamObject.groupInsertPoints[key] === masterStreamObject.groupInsertPoints[key]
+          streamObject.groupInsertPoints[key] ===
+            streamObjectMaster.groupInsertPoints[key]
         );
       })
     );
@@ -31,14 +29,14 @@ export default function hlsMerge(data) {
   let hasBeenRejected = false;
   const createRejection = detail => {
     hasBeenRejected = true;
-    return {error: "hlsMerge failed", detail};
+    return { error: "hlsMerge failed", detail };
   };
 
   return new Promise((resolve, reject) => {
     const audioStreams = [];
     const videoStreams = [];
     const promises = [];
-
+    console.log(111, data.length);
     // This first loop reads each supplied data
     // the `.body` of which is the content of
     // a `stream.m3u8` file.
@@ -55,6 +53,7 @@ export default function hlsMerge(data) {
     // (useful for serving the parts via db entries
     // served thru api enpoints)
     data.forEach((dataItem, dataItemIndex) => {
+      console.log(dataItemIndex, hasBeenRejected);
       if (hasBeenRejected) return;
       audioStreams.push([]);
       videoStreams.push([]);
@@ -63,108 +62,163 @@ export default function hlsMerge(data) {
       // is assumed to be content of a `stream.m3u8`
       let streamArray;
       try {
-        streamArray = m3u8Reader(data.body);
+        streamArray = m3u8Reader(dataItem.body);
       } catch (err) {
-        reject(createRejection({
-          err,
-          msg: 'Failed to read m3u8 data'
-        }));
+        reject(
+          createRejection({
+            err,
+            msg: "Failed to read m3u8 data"
+          })
+        );
         return;
       }
-
+      console.log(1112);
       // Create custom parsed object for our purposes
       const streamObj = streamArrayToObject(streamArray);
       if (dataItemIndex === 0) {
-        masterStreamObject = streamObj;
+        streamObjectMaster = streamObj;
       } else {
         valid = streamValidShape(streamObj);
         if (!valid) {
-          reject(createRejection({
-            msg: "stream.m3u8's must be same format"
-          }));
+          reject(
+            createRejection({
+              msg: "stream.m3u8's must be same format"
+            })
+          );
           return;
-        };
+        }
       }
-
+      console.log(1113);
       streamObj.audio.forEach((audioData, audioIndex) => {
+        console.log(1113, audioIndex);
         audioStreams[dataItemIndex].push(null);
+        console.log(1113, dataItem.containerUrl + audioData.MEDIA.URI);
         const req = request(dataItem.containerUrl + audioData.MEDIA.URI)
           .then(response => {
             let audioStream;
             try {
               audioStream = m3u8Reader(response);
             } catch (err) {
-              return Promise.reject(createRejection({
-                err,
-                msg: 'failed to read audio m3u8 data'
-              }));
+              console.log(1113, err);
+              return Promise.reject(
+                createRejection({
+                  err,
+                  msg: "failed to read audio m3u8 data"
+                })
+              );
             }
-            audioStreams[dataItemIndex][audioIndex] = audioStreamArrayToObject(
+            audioStreams[dataItemIndex][audioIndex] = tsStreamArrayToObject(
               audioStream
             );
             return true;
-          });
+          })
+          .catch(reason => console.error("WTF?", reason));
+        console.log(1113, "?");
         promises.push(req);
         // optionally change the URI
         if (dataItem.audioStreamPrefix) {
-          audioData.MEDIA.URI = obj.audioStreamPrefix + audioData.MEDIA.URI;
+          console.log(1113, "wot?");
+          try {
+            audioData.MEDIA.URI =
+              dataItem.audioStreamPrefix + audioData.MEDIA.URI;
+          } catch (err) {
+            console.log(1113, err);
+          }
+          console.log(1113, "dafuk?");
         }
+        console.log(1113, "??");
       });
-
-      streamObj.video.sort(streamObjectVideoSortByFileName).forEach((videoData, videoIndex) => {
-        videoStreams[dataItemIndex].push(null);
-        const req = request(dataItem.containerUrl + videoData.__FILENAME__)
-          .then(response => {
+      console.log(1114);
+      streamObj.video
+        .sort(streamObjectVideoSortByFileName)
+        .forEach((videoData, videoIndex) => {
+          videoStreams[dataItemIndex].push(null);
+          console.log(1114, dataItem.containerUrl + videoData.__FILENAME__);
+          const req = request(
+            dataItem.containerUrl + videoData.__FILENAME__
+          ).then(response => {
             let videoStream;
             try {
               videoStream = m3u8Reader(response);
             } catch (err) {
-              return Promise.reject(createRejection({
-                err,
-                msg: 'failed to read video m3u8 data'
-              }));
+              return Promise.reject(
+                createRejection({
+                  err,
+                  msg: "failed to read video m3u8 data"
+                })
+              );
             }
-            videoStreams[dataItemIndex][videoIndex] = videoStreamArrayToObject(
+            videoStreams[dataItemIndex][videoIndex] = tsStreamArrayToObject(
               videoStream
             );
             return true;
           });
-        promises.push(req);
-        // optionally change the URI
-        if (dataItem.videoStreamPrefix) {
-          videoData.__FILENAME__ = obj.videoStreamPrefix + videoData.__FILENAME__;
-        }
-      });
+          promises.push(req);
+          // optionally change the URI
+          if (dataItem.videoStreamPrefix) {
+            videoData.__FILENAME__ =
+              dataItem.videoStreamPrefix + videoData.__FILENAME__;
+          }
+        });
     });
-
+    console.log(222);
     // don't bother with rest if rejected
     if (hasBeenRejected) return;
     // ==========================
     // Now load all the file data
+
     Promise.all(promises)
-      .catch(reason => reject(createRejection({
-        reason,
-        msg: 'loading all the file data failed'
-      })))
+      .catch(reason =>
+        reject(
+          createRejection({
+            reason,
+            msg: "loading all the file data failed"
+          })
+        )
+      )
       .then(results => {
         // OK now we should have all the audio / video stream data we need
         data.forEach((dataItem, dataItemIndex) => {
-          const audioStreamObjects = audioStreams[dataItemIndex];
-          const videoStreamObjects = videoStreams[dataItemIndex];
-          audioStreamObjects.forEach((audioStreamObject, i) => {
-            if (dataItemIndex === 0) {
-              masterAudioStreamObjects.push(audioStreamObject);
-            } else {
-              // do merging
-            }
+          const tsStreamObjects = {
+            audio: audioStreams[dataItemIndex],
+            video: videoStreams[dataItemIndex]
+          };
+
+          Object.keys(tsStreamObjects).forEach(key => {
+            tsStreamObjects[key].forEach((tsStreamObject, i) => {
+              if (dataItem.replacePathToTsRoot) {
+                // file path replacements
+                tsStreamObject.ts.forEach(item => {
+                  item.__FILEPATH__ = item.__FILEPATH__.replace(
+                    dataItem.replacePathToTsRoot.from,
+                    dataItem.replacePathToTsRoot.to
+                  );
+                });
+              }
+              if (dataItemIndex === 0) {
+                tsStreamMasters[key].push(tsStreamObject);
+              } else {
+                // do merging
+              }
+            });
           });
-          videoStreamObjects.forEach((videoStreamObject, i) => {
-            if (dataItemIndex === 0) {
-              masterVideoStreamObjects.push(videoStreamObject);
-            } else {
-              // do merging
-            }
-          });
+
+          // const audioStreamObjects = audioStreams[dataItemIndex];
+          // const videoStreamObjects = videoStreams[dataItemIndex];
+          // audioStreamObjects.forEach((audioStreamObject, i) => {
+          //   if (dataItemIndex === 0) {
+          //     masterAudioStreamObjects.push(audioStreamObject);
+          //   } else {
+          //     // do merging
+          //   }
+          // });
+          // videoStreamObjects.forEach((videoStreamObject, i) => {
+          //   if (dataItemIndex === 0) {
+          //     masterVideoStreamObjects.push(videoStreamObject);
+          //   } else {
+          //     // do merging
+          //   }
+          // });
 
           // FINALLY
           // =======
@@ -186,20 +240,20 @@ export default function hlsMerge(data) {
 
           resolve({
             stream: {
-              filename: 'stream.m3u8',
-              content: m3u8Writer(streamObjectToArray(masterStreamObject))
+              filename: "stream.m3u8",
+              content: m3u8Writer(streamObjectToArray(streamObjectMaster))
             },
-            audios: masterAudioStreamObjects.map(obj => {
+            audios: tsStreamMasters.audio.map(obj => {
               return {
                 filename: obj.__FILENAME__,
-                content: m3u8Writer(audioStreamObjectToArray(obj))
-              }
+                content: m3u8Writer(tsStreamObjectToArray(obj))
+              };
             }),
-            videos: masterVideoStreamObjects.map(obj => {
+            videos: tsStreamMasters.video.map(obj => {
               return {
                 filename: obj.__FILENAME__,
-                content: m3u8Writer(videoStreamObjectToArray(obj))
-              }
+                content: m3u8Writer(tsStreamObjectToArray(obj))
+              };
             })
           });
         });

@@ -21,15 +21,17 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
     "nock": "^9.0.22",
-    "request-promise-native": "^1.0.5"
+    "request-promise-native": "^1.0.5",
+    "static-server": "^2.0.5"
   },
   "scripts": {
     "test": "ava",
-    "build": "babel --ignore=**/*.test.js,**_*.js src -d lib --source-maps --no-comments",
+    "build":
+      "babel --ignore=**/*.test.js,**_*.js src -d lib --source-maps --no-comments",
     "prepare": "npm run build"
   },
   "ava": {
-    "require": ["babel-register", "babel-polyfill"],
+    "require": ["babel-register", "babel-polyfill", "request-promise-native"],
     "babel": "inherit"
   }
 }
