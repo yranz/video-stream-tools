@@ -9,39 +9,30 @@ test("hlsMerge", async t => {
   const mockData = [
     {
       body: getFileContent("video1", "stream"),
+      containerUrl: `${mockUrl}/video1/`,
       replacePathToTsRoot: {
         from: "../",
         to: `${mockUrl}/video1/`
       },
-      replacePathToAudioStreamsRoot: {
-        from: "../",
-        to: "/api/hls-audio/video1/" /*audio0.m3u8*/
-      },
-      replacePathToVideoStreamsRoot: {
-        from: "../",
-        to: "/api/hls-video/video1/" /*video-0-7000000.m3u8*/
-      }
+      audioStreamPrefix: "http://whatever/api/hls/video1/audio/",
+      videoStreamPrefix: "http://whatever/api/hls/video1/video/"
     },
     {
       body: getFileContent("video2", "stream"),
+      containerUrl: `${mockUrl}/video1/`,
       replacePathToTsRoot: {
         from: "../",
         to: `${mockUrl}/video2/`
       },
-      replacePathToAudioStreamsRoot: {
-        from: "../",
-        to: "/api/hls-audio/video2/" /*audio0.m3u8*/
-      },
-      replacePathToVideoStreamsRoot: {
-        from: "../",
-        to: "/api/hls-video/video2/" /*video-0-7000000.m3u8*/
-      }
+      audioStreamPrefix: "/api/hls-audio/video2/",
+      videoStreamPrefix: "/api/hls-video/video2/"
     }
   ];
-  await hlsMerge(mockData)
-    .catch(reason => t.fail(reason))
-    .then(response => {
-      t.is(typeof response, "object");
-      t.is(typeof response.stream, "string");
-    });
+  // await hlsMerge(mockData)
+  //   .catch(reason => t.fail(reason))
+  //   .then(response => {
+  //     t.is(typeof response, "object");
+  //     t.is(typeof response.stream, "string");
+  //   });
+  t.fail('TODO: need to write other parts first');
 });
