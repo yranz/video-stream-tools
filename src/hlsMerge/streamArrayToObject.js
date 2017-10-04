@@ -16,7 +16,7 @@ export default function streamArrayToObject(streamArray) {
       }
       obj.video.push(item);
     } else if (typeof item === "string" && arr[lastPointer]["STREAM-INF"]) {
-      // NOTE: `__VALUE__` is not a valid m3u8 prop
+      // NOTE: `__FILENAME__` is not a valid m3u8 prop
       //
       // we store the string as `__FILENAME__`
       // so we can optionally sort videos array

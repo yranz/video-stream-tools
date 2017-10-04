@@ -25,7 +25,7 @@
   },
   "scripts": {
     "test": "ava",
-    "build": "babel --ignore=**/*.test.js,**_*.js src -d lib --source-maps",
+    "build": "babel --ignore=**/*.test.js,**_*.js src -d lib --source-maps --no-comments",
     "prepare": "npm run build"
   },
   "ava": {

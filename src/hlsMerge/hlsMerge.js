@@ -1,11 +1,13 @@
-import reader from "m3u8-reader";
-import writer from "m3u8-write";
+import m3u8Reader from "m3u8-reader";
+import m3u8Writer from "m3u8-write";
 import request from "request-promise-native";
 import streamArrayToObject from "./streamArrayToObject";
 import streamObjectToArray from "./streamObjectToArray";
 import streamObjectVideoSortByFileName from "./streamObjectVideoSortByFileName";
 import audioStreamArrayToObject from './audioStreamArrayToObject';
+import audioStreamObjectToArray from './audioStreamObjectToArray';
 import videoStreamArrayToObject from './videoStreamArrayToObject';
+import videoStreamObjectToArray from './videoStreamObjectToArray';
 
 export default function hlsMerge(data) {
   let masterStreamObject;
@@ -61,7 +63,7 @@ export default function hlsMerge(data) {
       // is assumed to be content of a `stream.m3u8`
       let streamArray;
       try {
-        streamArray = reader(data.body);
+        streamArray = m3u8Reader(data.body);
       } catch (err) {
         reject(createRejection({
           err,
@@ -90,7 +92,7 @@ export default function hlsMerge(data) {
           .then(response => {
             let audioStream;
             try {
-              audioStream = reader(response);
+              audioStream = m3u8Reader(response);
             } catch (err) {
               return Promise.reject(createRejection({
                 err,
@@ -115,7 +117,7 @@ export default function hlsMerge(data) {
           .then(response => {
             let videoStream;
             try {
-              videoStream = reader(response);
+              videoStream = m3u8Reader(response);
             } catch (err) {
               return Promise.reject(createRejection({
                 err,
@@ -185,18 +187,18 @@ export default function hlsMerge(data) {
           resolve({
             stream: {
               filename: 'stream.m3u8',
-              content: writer(streamObjectToArray(masterStreamObject))
+              content: m3u8Writer(streamObjectToArray(masterStreamObject))
             },
             audios: masterAudioStreamObjects.map(obj => {
               return {
                 filename: obj.__FILENAME__,
-                content: writer(audioStreamObjectToArray(obj))
+                content: m3u8Writer(audioStreamObjectToArray(obj))
               }
             }),
             videos: masterVideoStreamObjects.map(obj => {
               return {
                 filename: obj.__FILENAME__,
-                content: writer(videoStreamObjectToArray(obj))
+                content: m3u8Writer(videoStreamObjectToArray(obj))
               }
             })
           });
