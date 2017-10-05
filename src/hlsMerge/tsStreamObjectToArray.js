@@ -12,6 +12,7 @@ export default function tsStreamObjectToArray(streamObject) {
     items.push(item);
     items.push(filePath);
   });
+
   arr.splice(insertPoint, 0, ...items);
 
   return arr;

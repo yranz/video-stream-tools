@@ -189,65 +189,43 @@ export default function hlsMerge(data) {
               }
             });
           });
+        });
 
-          // FINALLY
-          // =======
-          // resolve file contents (to be saved in db or as files)
-          // 1 * stream (because all should be the same, they point to save generic names)
-          // x * audio streams (typically one)
-          // x * video streams (for different bitrates)
-          // NOTE: we have sorted the order of the video streams
-          //       the originals will be in mixed order.
-          //       I could not see any pattern to it.
-          //       I think they are just written by which
-          //       ever gets processed first.
-          //       According to spec only the first "matters"
-          //       and by thet it means the first will be used
-          //       until the others are loaded and the browser
-          //       decides which bitrate stream is more appropriate.
-          //       By sorting it enables us to make sure we are
-          //       mergeing the correct stream data.
-          // console.log(111);
-          // console.log(JSON.stringify(tsStreamMasters.audio, null, 2));
-          const out = {
-            stream: {
-              filename: "stream.m3u8",
-              content: m3u8Writer(streamObjectToArray(streamObjectMaster))
-            },
-            audios: tsStreamMasters.audio.map(obj => {
-              const arr = tsStreamObjectToArray(obj);
-              const content = m3u8Writer(arr);
+        // FINALLY
+        // =======
+        // resolve file contents (to be saved in db or as files)
+        // 1 * stream (because all should be the same, they point to save generic names)
+        // x * audio streams (typically one)
+        // x * video streams (for different bitrates)
+        // NOTE: we have sorted the order of the video streams
+        //       the originals will be in mixed order.
+        //       I could not see any pattern to it.
+        //       I think they are just written by which
+        //       ever gets processed first.
+        //       According to spec only the first "matters"
+        //       and by thet it means the first will be used
+        //       until the others are loaded and the browser
+        //       decides which bitrate stream is more appropriate.
+        //       By sorting it enables us to make sure we are
+        //       mergeing the correct stream data.
 
-              // console.log("======");
-              // console.log(tsStreamMasters.audio.length);
-              // console.log("obj ======");
-              // console.log(JSON.stringify(obj, null, 2));
-              // console.log("arr ======");
-              // console.log(JSON.stringify(arr, null, 2));
-              // console.log("content ======");
-              // console.log(content);
-              // const wot = m3u8Reader(content);
-              // console.log("wot ======");
-              // console.log(JSON.stringify(wot, null, 2));
-              // console.log("======");
-              return {
-                filename: obj.__FILENAME__,
-                content
-                //content: /*m3u8Writer(*/ tsStreamObjectToArray(obj) /*)*/
-              };
-            }),
-            videos: tsStreamMasters.video.map(obj => {
-              return {
-                filename: obj.__FILENAME__,
-                content: m3u8Writer(tsStreamObjectToArray(obj))
-              };
-            })
-          };
-          console.log("out =======");
-          console.log(out);
-          resolve(out);
-          console.log("out =======");
-          console.log(out);
+        resolve({
+          stream: {
+            filename: "stream.m3u8",
+            content: m3u8Writer(streamObjectToArray(streamObjectMaster))
+          },
+          audios: tsStreamMasters.audio.map(obj => {
+            return {
+              filename: obj.__FILENAME__,
+              content: m3u8Writer(tsStreamObjectToArray(obj))
+            };
+          }),
+          videos: tsStreamMasters.video.map(obj => {
+            return {
+              filename: obj.__FILENAME__,
+              content: m3u8Writer(tsStreamObjectToArray(obj))
+            };
+          })
         });
       });
   });

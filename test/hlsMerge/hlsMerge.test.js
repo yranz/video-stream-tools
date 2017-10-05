@@ -33,7 +33,8 @@ test("hlsMerge", async t => {
     .then(response => {
       t.is(typeof response, "object");
       t.is(typeof response.stream, "object");
-      console.log(JSON.stringify(response, null, 2));
+
+      // console.log(response);
       // t.fail();
     });
 });
