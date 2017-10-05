@@ -36,7 +36,6 @@ export default function hlsMerge(data) {
     const audioStreams = [];
     const videoStreams = [];
     const promises = [];
-    console.log(111, data.length);
     // This first loop reads each supplied data
     // the `.body` of which is the content of
     // a `stream.m3u8` file.
@@ -53,7 +52,6 @@ export default function hlsMerge(data) {
     // (useful for serving the parts via db entries
     // served thru api enpoints)
     data.forEach((dataItem, dataItemIndex) => {
-      console.log(dataItemIndex, hasBeenRejected);
       if (hasBeenRejected) return;
       audioStreams.push([]);
       videoStreams.push([]);
@@ -72,13 +70,12 @@ export default function hlsMerge(data) {
         );
         return;
       }
-      console.log(1112);
       // Create custom parsed object for our purposes
       const streamObj = streamArrayToObject(streamArray);
       if (dataItemIndex === 0) {
         streamObjectMaster = streamObj;
       } else {
-        valid = streamValidShape(streamObj);
+        const valid = streamValidShape(streamObj);
         if (!valid) {
           reject(
             createRejection({
@@ -88,52 +85,38 @@ export default function hlsMerge(data) {
           return;
         }
       }
-      console.log(1113);
       streamObj.audio.forEach((audioData, audioIndex) => {
-        console.log(1113, audioIndex);
         audioStreams[dataItemIndex].push(null);
-        console.log(1113, dataItem.containerUrl + audioData.MEDIA.URI);
-        const req = request(dataItem.containerUrl + audioData.MEDIA.URI)
-          .then(response => {
-            let audioStream;
-            try {
-              audioStream = m3u8Reader(response);
-            } catch (err) {
-              console.log(1113, err);
-              return Promise.reject(
-                createRejection({
-                  err,
-                  msg: "failed to read audio m3u8 data"
-                })
-              );
-            }
-            audioStreams[dataItemIndex][audioIndex] = tsStreamArrayToObject(
-              audioStream
+        const req = request(
+          dataItem.containerUrl + audioData.MEDIA.URI
+        ).then(response => {
+          let audioStream;
+          try {
+            audioStream = m3u8Reader(response);
+          } catch (err) {
+            return Promise.reject(
+              createRejection({
+                err,
+                msg: "failed to read audio m3u8 data"
+              })
             );
-            return true;
-          })
-          .catch(reason => console.error("WTF?", reason));
-        console.log(1113, "?");
+          }
+          audioStreams[dataItemIndex][audioIndex] = tsStreamArrayToObject(
+            audioStream
+          );
+          return true;
+        });
         promises.push(req);
         // optionally change the URI
         if (dataItem.audioStreamPrefix) {
-          console.log(1113, "wot?");
-          try {
-            audioData.MEDIA.URI =
-              dataItem.audioStreamPrefix + audioData.MEDIA.URI;
-          } catch (err) {
-            console.log(1113, err);
-          }
-          console.log(1113, "dafuk?");
+          audioData.MEDIA.URI =
+            dataItem.audioStreamPrefix + audioData.MEDIA.URI;
         }
-        console.log(1113, "??");
       });
-      console.log(1114);
       streamObj.video
         .sort(streamObjectVideoSortByFileName)
         .forEach((videoData, videoIndex) => {
           videoStreams[dataItemIndex].push(null);
-          console.log(1114, dataItem.containerUrl + videoData.__FILENAME__);
           const req = request(
             dataItem.containerUrl + videoData.__FILENAME__
           ).then(response => {
@@ -161,7 +144,6 @@ export default function hlsMerge(data) {
           }
         });
     });
-    console.log(222);
     // don't bother with rest if rejected
     if (hasBeenRejected) return;
     // ==========================

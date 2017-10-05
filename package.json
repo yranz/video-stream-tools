@@ -20,18 +20,28 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
+    "concurrently": "^3.5.0",
     "nock": "^9.0.22",
     "request-promise-native": "^1.0.5",
     "static-server": "^2.0.5"
   },
   "scripts": {
-    "test": "ava",
     "build":
       "babel --ignore=**/*.test.js,**_*.js src -d lib --source-maps --no-comments",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test:ava": "ava",
+    "test:serve": "node ./test/fixtures/_serve.js",
+    "test:watch":
+      "concurrently --raw \"npm run test:serve\" \"npm run test:ava -- --watch\"",
+    "test":
+      "concurrently --kill-others --raw \"npm run test:serve\" \"npm run test:ava\""
   },
   "ava": {
     "require": ["babel-register", "babel-polyfill", "request-promise-native"],
-    "babel": "inherit"
+    "babel": "inherit",
+    "custom": {
+      "TEST_HOST": "localhost",
+      "TEST_PORT": 1337
+    }
   }
 }
