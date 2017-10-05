@@ -60,7 +60,7 @@ test("preflight", t => {
   t.is(typeof dashMerge, "function");
 });
 
-test('works as expected (against fixtures)', t => {
+test('works as expected (against fixtures)', async t => {
   const parser = new Parser();
   const mockLoadedMpds = mockRefs.map(ref => ({
     id: ref,
@@ -70,15 +70,18 @@ test('works as expected (against fixtures)', t => {
       to: mockRelativePathToEncodedFromMerged + "/" + ref + "/"
     }
   }));
-  const combined = dashMerge(mockLoadedMpds);
-  t.is(typeof combined, "string");
-  parser.parseString(combined, (err, pojo) => {
-    t.is(pojo.MPD.Period.length, mockRefs.length);
-    t.is(
-      pojo.MPD.Period[0].AdaptationSet[0].Representation[0].SegmentTemplate[0].$.media.indexOf(
-        mockLoadedMpds[0].replacePathToSelfRoot.to
-      ),
-      0
-    );
-  });
+
+  await dashMerge(mockLoadedMpds)
+    .then(response => {
+      t.is(typeof response.stream.content, "string");
+      parser.parseString(response.stream.content, (err, pojo) => {
+        t.is(pojo.MPD.Period.length, mockRefs.length);
+        t.is(
+          pojo.MPD.Period[0].AdaptationSet[0].Representation[0].SegmentTemplate[0].$.media.indexOf(
+            mockLoadedMpds[0].replacePathToSelfRoot.to
+          ),
+          0
+        );
+      });
+    });
 });

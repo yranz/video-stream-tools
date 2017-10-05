@@ -51,5 +51,11 @@ export default function dashMerge(data) {
     getTotalDuration()
   );
 
-  return builder.buildObject(mpdPOJO);
+  // NOTE: returns a promise for consistency with hlsMerge
+  return Promise.resolve({
+    stream: {
+      filename: 'stream.mpd',
+      content: builder.buildObject(mpdPOJO)
+    }
+  });
 }
