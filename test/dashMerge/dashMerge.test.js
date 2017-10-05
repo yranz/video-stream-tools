@@ -7,7 +7,7 @@ import {
   millisecondsToIso8601Duration
 } from "../../src/timeConversion";
 
-import mpdMerge from "../../src/mpdMerge/mpdMerge";
+import dashMerge from "../../src/dashMerge/dashMerge";
 
 const mockRefs = ["video1", "video2"];
 
@@ -57,7 +57,7 @@ test("preflight", t => {
   t.is(typeof xml, "string");
   t.is(xml.replace(/\s/gi, ""), mockStrings[0].replace(/\s/gi, ""));
 
-  t.is(typeof mpdMerge, "function");
+  t.is(typeof dashMerge, "function");
 });
 
 test('works as expected (against fixtures)', t => {
@@ -70,7 +70,7 @@ test('works as expected (against fixtures)', t => {
       to: mockRelativePathToEncodedFromMerged + "/" + ref + "/"
     }
   }));
-  const combined = mpdMerge(mockLoadedMpds);
+  const combined = dashMerge(mockLoadedMpds);
   t.is(typeof combined, "string");
   parser.parseString(combined, (err, pojo) => {
     t.is(pojo.MPD.Period.length, mockRefs.length);

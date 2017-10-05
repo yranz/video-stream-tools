@@ -21,7 +21,7 @@ const replacePathToSelf = (Period, { to, from }) => {
   }
 };
 
-export default function mpdMerge(data) {
+export default function dashMerge(data) {
   let mpdPOJO;
   const durations = [];
   const getTotalDuration = () => durations.reduce((a, b) => a + b, 0);
