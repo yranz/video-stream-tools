@@ -1,6 +1,6 @@
 import { test } from "ava";
-import reader from "m3u8-reader";
-import writer from "m3u8-write";
+import m3u8Reader from "m3u8-reader";
+import m3u8Writer from "m3u8-write";
 import streamArrayToObject from "../../src/hlsMerge/streamArrayToObject";
 import streamObjectToArray from "../../src/hlsMerge/streamObjectToArray";
 import streamObjectVideoSortByFileName from "../../src/hlsMerge/streamObjectVideoSortByFileName";
@@ -10,9 +10,9 @@ import { mockUrl, getFileContent } from "./_mockRequestm3u8File";
 
 test("streamArrayToObject / streamObjectToArray", t => {
   const fileContent = getFileContent("video1", "stream");
-  const fileStreamArray = reader(fileContent);
+  const fileStreamArray = m3u8Reader(fileContent);
   t.true(Array.isArray(fileStreamArray));
-  const fileStreamOut = writer(fileStreamArray);
+  const fileStreamOut = m3u8Writer(fileStreamArray);
 
   const streamObject = streamArrayToObject(fileStreamArray);
   t.is(typeof streamObject, "object");
@@ -20,21 +20,21 @@ test("streamArrayToObject / streamObjectToArray", t => {
   const backToArray = streamObjectToArray(streamObject);
   t.true(Array.isArray(backToArray));
 
-  const m3u8Out = writer(backToArray);
+  const m3u8Out = m3u8Writer(backToArray);
   t.is(typeof m3u8Out, "string");
 
   t.is(fileStreamOut, m3u8Out);
 
   streamObject.video.sort(streamObjectVideoSortByFileName);
   const sortedBackToArray = streamObjectToArray(streamObject);
-  const sortedOut = writer(sortedBackToArray);
+  const sortedOut = m3u8Writer(sortedBackToArray);
   t.not(fileStreamOut, sortedOut);
 });
 
 test("tsStreamArrayToObject / tsStreamObjectToArray", t => {
   const fileContent = getFileContent("video1", "audio0");
-  const fileStreamArray = reader(fileContent);
-  const fileStreamOut = writer(fileStreamArray);
+  const fileStreamArray = m3u8Reader(fileContent);
+  const fileStreamOut = m3u8Writer(fileStreamArray);
   t.true(Array.isArray(fileStreamArray));
   const streamObject = tsStreamArrayToObject(fileStreamArray);
   t.is(typeof streamObject, "object");
@@ -42,7 +42,7 @@ test("tsStreamArrayToObject / tsStreamObjectToArray", t => {
   t.true(Array.isArray(backToArray));
 
   t.is(typeof fileStreamOut, "string");
-  const backToArrayOut = writer(backToArray);
+  const backToArrayOut = m3u8Writer(backToArray);
   t.is(typeof backToArrayOut, "string");
   t.is(fileStreamOut, backToArrayOut);
 
@@ -51,6 +51,6 @@ test("tsStreamArrayToObject / tsStreamObjectToArray", t => {
     __FILEPATH__: "../ts/audio/128000/another.ts"
   });
   const anotherAdded = tsStreamObjectToArray(streamObject);
-  const anotherAddedOut = writer(anotherAdded);
+  const anotherAddedOut = m3u8Writer(anotherAdded);
   t.not(fileStreamOut, anotherAddedOut);
 });

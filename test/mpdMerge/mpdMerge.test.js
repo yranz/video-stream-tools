@@ -60,7 +60,7 @@ test("preflight", t => {
   t.is(typeof mpdMerge, "function");
 });
 
-test("mpdMerge", t => {
+test('works as expected (against fixtures)', t => {
   const parser = new Parser();
   const mockLoadedMpds = mockRefs.map(ref => ({
     id: ref,

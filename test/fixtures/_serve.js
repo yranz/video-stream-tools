@@ -7,14 +7,14 @@ const server = new StaticServer({
   port: pkg.ava.custom.TEST_PORT
 });
 
-server.start();
+if (pkg.ava.custom.LOG_SERVER) {
+  server.start(function() {
+    console.log("Test Server listening to", server.port);
+  });
 
-// for these youd need to turn off --raw on concurrently command
-
-// server.start(function() {
-//   console.log("Server listening to", server.port);
-// });
-
-// server.on("request", function(req, res) {
-//   console.log("request", req.url);
-// });
+  server.on("request", function(req, res) {
+    console.log("\nrequest", req.url);
+  });
+} else {
+  server.start();
+}

@@ -3,8 +3,10 @@
 ## Development Commands
 
 * `npm run test`
-* watch `npm run test -- --watch`
+* watch `npm run test:watch`
 * `npm run build`
+
+_NOTE_ no need to run `test:ava` and `test:serve` (they are run by `test` / `test:watch`)
 
 Build should run on install
 

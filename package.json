@@ -29,19 +29,20 @@
     "build":
       "babel --ignore=**/*.test.js,**_*.js src -d lib --source-maps --no-comments",
     "prepare": "npm run build",
-    "test:ava": "ava --no-cache",
-    "test:serve": "node ./test/fixtures/_serve.js",
+    "test":
+      "concurrently --kill-others --raw \"npm run test:serve\" \"npm run test:ava\"",
     "test:watch":
       "concurrently --raw \"npm run test:serve\" \"npm run test:ava -- --watch\"",
-    "test":
-      "concurrently --kill-others --raw \"npm run test:serve\" \"npm run test:ava\""
+    "test:ava": "ava",
+    "test:serve": "node ./test/fixtures/_serve.js"
   },
   "ava": {
     "require": ["babel-register", "babel-polyfill", "request-promise-native"],
     "babel": "inherit",
     "custom": {
       "TEST_HOST": "localhost",
-      "TEST_PORT": 1337
+      "TEST_PORT": 1337,
+      "LOG_SERVER": false
     }
   }
 }
