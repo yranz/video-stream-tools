@@ -1,3 +1,5 @@
-import mpdMerge from "./mpdMerge/mpdMerge";
+import dashMerge from "./dashMerge/dashMerge";
+import hlsMerge from "./hlsMerge/hlsMerge";
+import timeConversion from './timeConversion';
 
-export { mpdMerge };
+export { dashMerge, hlsMerge, timeConversion };
