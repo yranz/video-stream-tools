@@ -29,7 +29,7 @@
     "build":
       "babel --ignore=**/*.test.js,**_*.js src -d lib --source-maps --no-comments",
     "prepare": "npm run build",
-    "test:ava": "ava",
+    "test:ava": "ava --no-cache",
     "test:serve": "node ./test/fixtures/_serve.js",
     "test:watch":
       "concurrently --raw \"npm run test:serve\" \"npm run test:ava -- --watch\"",

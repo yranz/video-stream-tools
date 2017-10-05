@@ -26,11 +26,12 @@ export const getFileContent = (id, fileName) => {
 };
 
 // DEPRECATED
-// only worked at test level - no time to further investigate
-// insead running a test local server to sere fixtures
+// only worked at test file level - no time to further investigate
+// instead running a test local server to sere fixtures
 const m3u8PathRegExp = /\/bucket\/encoded\/([0-9a-z]+)\/hls\/([0-9a-z-]+)\.m3u8/;
 const m3u8ApiPathRegExp = /\/api\/hls\/([0-9a-z]+)\/([audio|video]+)\/([0-9a-z-]+)\.m3u8/;
 export function setupNocks() {
+  console.error("DEPRECATED");
   nock(mockUrl)
     .get(m3u8PathRegExp)
     .reply(200, (uri, requestBody) => {

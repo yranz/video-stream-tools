@@ -2,18 +2,10 @@ import { test } from "ava";
 import reader from "m3u8-reader";
 import writer from "m3u8-write";
 import { mockUrl, getFileContent } from "./_mockRequestm3u8File";
-// import request from "request-promise-native";
 
 import hlsMerge from "../../src/hlsMerge/hlsMerge";
 
-// test("requests", async t => {
-//   await request("http://mock/bucket/encoded/video1/hls/audio0.m3u8")
-//     .then(response => {
-//       console.log("WORKS", response);
-//       t.is(typeof response, "string");
-//     })
-//     .catch(t.fail);
-// });
+const mockApiUrl = "http://whatever/api/hls/";
 
 test("hlsMerge", async t => {
   const mockData = [
@@ -22,20 +14,18 @@ test("hlsMerge", async t => {
       containerUrl: `${mockUrl}/bucket/encoded/video1/hls/`,
       replacePathToTsRoot: {
         from: "../",
-        to: `${mockUrl}/video1/`
+        to: `${mockUrl}/bucket/encoded/video1/`
       },
-      audioStreamPrefix: "http://whatever/api/hls/video1/audio/",
-      videoStreamPrefix: "http://whatever/api/hls/video1/video/"
+      tsStreamPrefix: `${mockApiUrl}video1/ts/`
     },
     {
       body: getFileContent("video2", "stream"),
-      containerUrl: `${mockUrl}/bucket/encoded/video1/hls/`,
+      containerUrl: `${mockUrl}/bucket/encoded/video2/hls/`,
       replacePathToTsRoot: {
         from: "../",
-        to: `${mockUrl}/video2/`
+        to: `${mockUrl}/bucket/encoded/video2/`
       },
-      audioStreamPrefix: "/api/hls-audio/video2/",
-      videoStreamPrefix: "/api/hls-video/video2/"
+      tsStreamPrefix: `${mockApiUrl}video2/ts/`
     }
   ];
   await hlsMerge(mockData)
@@ -43,7 +33,7 @@ test("hlsMerge", async t => {
     .then(response => {
       t.is(typeof response, "object");
       t.is(typeof response.stream, "object");
-      // console.log(response);
+      console.log(JSON.stringify(response, null, 2));
       // t.fail();
     });
 });

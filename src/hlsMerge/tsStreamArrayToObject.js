@@ -1,9 +1,10 @@
-export default function tsStreamArrayToObject(streamArray) {
+export default function tsStreamArrayToObject(streamArray, __FILENAME__) {
   const arr = streamArray.slice();
   const obj = {
     ts: [],
     other: [],
-    groupInsertPoints: {}
+    groupInsertPoints: {},
+    __FILENAME__
   };
 
   let lastPointer = -1;

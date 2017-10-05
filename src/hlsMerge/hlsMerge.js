@@ -87,8 +87,9 @@ export default function hlsMerge(data) {
       }
       streamObj.audio.forEach((audioData, audioIndex) => {
         audioStreams[dataItemIndex].push(null);
+        const __FILENAME__ = audioData.MEDIA.URI;
         const req = request(
-          dataItem.containerUrl + audioData.MEDIA.URI
+          dataItem.containerUrl + __FILENAME__
         ).then(response => {
           let audioStream;
           try {
@@ -102,23 +103,24 @@ export default function hlsMerge(data) {
             );
           }
           audioStreams[dataItemIndex][audioIndex] = tsStreamArrayToObject(
-            audioStream
+            audioStream,
+            __FILENAME__
           );
           return true;
         });
         promises.push(req);
         // optionally change the URI
-        if (dataItem.audioStreamPrefix) {
-          audioData.MEDIA.URI =
-            dataItem.audioStreamPrefix + audioData.MEDIA.URI;
+        if (dataItem.tsStreamPrefix) {
+          audioData.MEDIA.URI = dataItem.tsStreamPrefix + audioData.MEDIA.URI;
         }
       });
       streamObj.video
         .sort(streamObjectVideoSortByFileName)
         .forEach((videoData, videoIndex) => {
           videoStreams[dataItemIndex].push(null);
+          const __FILENAME__ = videoData.__FILENAME__;
           const req = request(
-            dataItem.containerUrl + videoData.__FILENAME__
+            dataItem.containerUrl + __FILENAME__
           ).then(response => {
             let videoStream;
             try {
@@ -132,15 +134,16 @@ export default function hlsMerge(data) {
               );
             }
             videoStreams[dataItemIndex][videoIndex] = tsStreamArrayToObject(
-              videoStream
+              videoStream,
+              __FILENAME__
             );
             return true;
           });
           promises.push(req);
           // optionally change the URI
-          if (dataItem.videoStreamPrefix) {
+          if (dataItem.tsStreamPrefix) {
             videoData.__FILENAME__ =
-              dataItem.videoStreamPrefix + videoData.__FILENAME__;
+              dataItem.tsStreamPrefix + videoData.__FILENAME__;
           }
         });
     });
@@ -167,7 +170,7 @@ export default function hlsMerge(data) {
           };
 
           Object.keys(tsStreamObjects).forEach(key => {
-            tsStreamObjects[key].forEach((tsStreamObject, i) => {
+            tsStreamObjects[key].forEach((tsStreamObject, tsStreamIndex) => {
               if (dataItem.replacePathToTsRoot) {
                 // file path replacements
                 tsStreamObject.ts.forEach(item => {
@@ -180,27 +183,12 @@ export default function hlsMerge(data) {
               if (dataItemIndex === 0) {
                 tsStreamMasters[key].push(tsStreamObject);
               } else {
-                // do merging
+                tsStreamObject.ts.forEach((item, i) =>
+                  tsStreamMasters[key][tsStreamIndex].ts.push(item)
+                );
               }
             });
           });
-
-          // const audioStreamObjects = audioStreams[dataItemIndex];
-          // const videoStreamObjects = videoStreams[dataItemIndex];
-          // audioStreamObjects.forEach((audioStreamObject, i) => {
-          //   if (dataItemIndex === 0) {
-          //     masterAudioStreamObjects.push(audioStreamObject);
-          //   } else {
-          //     // do merging
-          //   }
-          // });
-          // videoStreamObjects.forEach((videoStreamObject, i) => {
-          //   if (dataItemIndex === 0) {
-          //     masterVideoStreamObjects.push(videoStreamObject);
-          //   } else {
-          //     // do merging
-          //   }
-          // });
 
           // FINALLY
           // =======
@@ -219,16 +207,33 @@ export default function hlsMerge(data) {
           //       decides which bitrate stream is more appropriate.
           //       By sorting it enables us to make sure we are
           //       mergeing the correct stream data.
-
-          resolve({
+          // console.log(111);
+          // console.log(JSON.stringify(tsStreamMasters.audio, null, 2));
+          const out = {
             stream: {
               filename: "stream.m3u8",
               content: m3u8Writer(streamObjectToArray(streamObjectMaster))
             },
             audios: tsStreamMasters.audio.map(obj => {
+              const arr = tsStreamObjectToArray(obj);
+              const content = m3u8Writer(arr);
+
+              // console.log("======");
+              // console.log(tsStreamMasters.audio.length);
+              // console.log("obj ======");
+              // console.log(JSON.stringify(obj, null, 2));
+              // console.log("arr ======");
+              // console.log(JSON.stringify(arr, null, 2));
+              // console.log("content ======");
+              // console.log(content);
+              // const wot = m3u8Reader(content);
+              // console.log("wot ======");
+              // console.log(JSON.stringify(wot, null, 2));
+              // console.log("======");
               return {
                 filename: obj.__FILENAME__,
-                content: m3u8Writer(tsStreamObjectToArray(obj))
+                content
+                //content: /*m3u8Writer(*/ tsStreamObjectToArray(obj) /*)*/
               };
             }),
             videos: tsStreamMasters.video.map(obj => {
@@ -237,7 +242,12 @@ export default function hlsMerge(data) {
                 content: m3u8Writer(tsStreamObjectToArray(obj))
               };
             })
-          });
+          };
+          console.log("out =======");
+          console.log(out);
+          resolve(out);
+          console.log("out =======");
+          console.log(out);
         });
       });
   });

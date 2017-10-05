@@ -8,6 +8,41 @@ import tsStreamArrayToObject from "../../src/hlsMerge/tsStreamArrayToObject";
 import tsStreamObjectToArray from "../../src/hlsMerge/tsStreamObjectToArray";
 import { mockUrl, getFileContent } from "./_mockRequestm3u8File";
 
+test(t => {
+  const a = [
+    {
+      VERSION: "5"
+    },
+    {
+      "MEDIA-SEQUENCE": "0"
+    },
+    {
+      TARGETDURATION: "4"
+    },
+    {
+      EXTINF: "4.010666666666666"
+    },
+    "http://localhost:1337/bucket/encoded/video1/ts/audio/128000/segment_0.ts",
+    {
+      EXTINF: "0.9893333333333336"
+    },
+    "http://localhost:1337/bucket/encoded/video1/ts/audio/128000/segment_1.ts",
+    {
+      EXTINF: "4.010666666666666"
+    },
+    "http://localhost:1337/bucket/encoded/video2/ts/audio/128000/segment_0.ts",
+    {
+      EXTINF: "0.9884611913781187"
+    },
+    "http://localhost:1337/bucket/encoded/video2/ts/audio/128000/segment_1.ts",
+    "#EXT-X-ENDLIST"
+  ];
+
+  const content = writer(a);
+  t.is(typeof content, "string");
+  // console.log(content);
+});
+
 test("streamArrayToObject / streamObjectToArray", t => {
   const fileContent = getFileContent("video1", "stream");
   const fileStreamArray = reader(fileContent);
