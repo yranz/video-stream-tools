@@ -26,7 +26,7 @@ export default function dashMerge(data) {
   const durations = [];
   const getTotalDuration = () => durations.reduce((a, b) => a + b, 0);
   data.forEach(obj => {
-    parser.parseString(obj.body, function(err, pojo) {
+    parser.parseString(obj.body, (err, pojo) => {
       if (!mpdPOJO) {
         pojo.MPD.Period.forEach(Period =>
           replacePathToSelf(Period, obj.replacePathToSelfRoot)
@@ -54,7 +54,7 @@ export default function dashMerge(data) {
   // NOTE: returns a promise for consistency with hlsMerge
   return Promise.resolve({
     stream: {
-      filename: 'stream.mpd',
+      filename: "stream.mpd",
       content: builder.buildObject(mpdPOJO)
     }
   });

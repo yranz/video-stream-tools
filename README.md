@@ -158,3 +158,21 @@ hlsMerge([
     }
   })
 ```
+
+# timingDataFromDash
+
+`timingDataFromDash(dashXmlString)`
+
+returns object of:
+
+```
+{
+  duration: 0, // number milliseconds
+  periods: [
+    {
+      start: 0, // number milliseconds
+      duration: 0, // number milliseconds
+    }
+  ]
+}
+```
